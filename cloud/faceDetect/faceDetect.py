@@ -44,7 +44,8 @@ def analyze_photo(file):
     try:
         # Send email only if there are 2 or more faces
         if int(ai.text)>=2:
-            send_email(int(ai.text))
+            link='https://storage.cloud.google.com/'+os.getenv("GSTORAGE_ID")+'/'+file
+            send_email(int(ai.text),link)
     except:
         print("Error sending email")
 
@@ -53,35 +54,30 @@ def upload_to_gcs(file_path):
     bucket = client.bucket(os.getenv("GSTORAGE_ID"))
     blob = bucket.blob(os.path.basename(file_path))
     blob.upload_from_filename(file_path)
-    print(f'File {file_path} loaded on Google Cloud Storage')
+    print(f'File {file_path} uploaded on Google Cloud Storage')
 
-def send_email(faces):
-    # Set Up the SMTP Server
-    smtp_server = os.getenv("SMTP_SERVER")
-    port = os.getenv("SMTP_PORT")
-    server = smtplib.SMTP(smtp_server,port)
+def send_email(faces,photourl):
+    # SMTP variables
+    smtp_user = os.getenv("SMTP_LOGIN_USER")
+    receiver_email = os.getenv("SMTP_TO")
+    password = os.getenv("SMTP_LOGIN_PASS")
 
-    # Create SMTP Session
-    server.starttls()
+    # Generate headers
+    msg = MIMEText(f"Attenzione! Sono stati rilevati ",faces," volti in casa! Guarda la foto: {photourl}")
+    msg["Subject"] = "Videosorveglianza: ATTENZIONE"
+    msg["From"] = os.getenv("SMTP_FROM")
+    msg["To"] = receiver_email
 
-    # Login to the Server
-    server.login(os.getenv("SMTP_LOGIN_USER"), os.getenv("SMTP_LOGIN_PASS"))
-
-    # Compose the Email
-    from_address = os.getenv("SMTP_FROM")
-    to_address = os.getenv("SMTP_TO")
-    subject = "Videosorveglianza: ATTENZIONE"
-    body = "Attenzione! Sono stati rilevati ",faces," volti in casa!"
-    email = f"Subject: {subject}\n\n{body}"
+    server = smtplib.SMTP_SSL(os.getenv("SMTP_SERVER"), os.getenv("SMTP_PORT"))
+    server.login(smtp_user, password)
     try:
         # Send the Email
-        server.sendmail(from_address, to_address, email)
+        server.sendmail(smtp_user, receiver_email, msg.as_string())
+        server.quit()
         print("Email sent")
     except:
+        server.quit()
         print("Error: email was not sent")
-
-    # Close the SMTP Session
-    server.quit()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
