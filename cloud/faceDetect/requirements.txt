@@ -1,0 +1,6 @@
+functions-framework==3.*
+google-cloud-storage
+google-cloud-aiplatform
+Flask==2.2.3
+Werkzeug==2.2.3
+email-to
