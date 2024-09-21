@@ -1,2 +1,3 @@
 .env
 cloud/facedetect/credentials.json
+*.jpg

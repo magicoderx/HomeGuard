@@ -25,7 +25,7 @@ def capture_photo():
         
         # Send photo to gcloud function
         with open(filename, 'rb') as f:
-            response = requests.post('https://',os.getenv("GFUNCTION_URL"),'.cloudfunctions.net/faceDetect', files={'file': f})
+            response = requests.post('https://'+os.getenv("GFUNCTION_URL")+'.cloudfunctions.net/faceDetect', files={'file': f})
             print(response.text)
     else:
         print("Error capturing image")
