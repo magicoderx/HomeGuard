@@ -11,10 +11,8 @@ def home(request):
     data_selected = request.args.get('data')
     
     if data_selected:
-        # Parse date in gcloud format
         start = datetime.datetime.strptime(data_selected, "%Y-%m-%d")
         end = start + datetime.timedelta(days=1)
-        # Get sensors data
         sensorDB = db.collection('sensori').where('timestamp', '>=', start).where('timestamp', '<', end).stream()
     else:
         sensorDB = db.collection('sensori').order_by('timestamp').limit(100).stream()
@@ -24,21 +22,25 @@ def home(request):
         dati = doc.to_dict()
         data.append([dati['timestamp'].strftime("%Y-%m-%d %H:%M:%S"), dati['temperature'], dati['consumption']])
     
-    # Write HTML string
     html = """
     <!DOCTYPE html>
     <html>
     <head>
         <title>Smart Home Dashboard</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <style>
             body {
                 background-color: #343a40;
-                height: 100vh;
+                height: 100%;
                 background-image: url('https://images.unsplash.com/photo-1503264116251-35a269479413?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');
                 background-size: cover;
                 background-position: center;
+                background-repeat: no-repeat;
                 color: #ffffff;
             }
             p,h1,h2,label {
@@ -98,16 +100,29 @@ def home(request):
             function displayImages(images) {
                 var slideshowDiv = document.getElementById('slideshow');
                 slideshowDiv.innerHTML = '';
+                var i = 0;
                 if (images.length === 0) {
                     slideshowDiv.innerHTML = '<p>Nessuna immagine disponibile per questa data.</p>';
+                    document.getElementById("prev").style.visibility = "hidden";
+                    document.getElementById("next").style.visibility = "hidden";
                 } else {
                     images.forEach(function(image) {
+                    var divElement = document.createElement('div');
+                    divElement.classList.add('carousel-item');
+                    if (i== 0){
+                        divElement.classList.add('active');
+                    }
                     var imgElement = document.createElement('img');
+                    imgElement.classList.add('d-block','w-100');
                     imgElement.src = image;
                     imgElement.style.width = '200px';
                     imgElement.style.margin = '5px';
-                    slideshowDiv.appendChild(imgElement);
+                    divElement.appendChild(imgElement);
+                    slideshowDiv.appendChild(divElement);
+                    i++;
                 });
+                document.getElementById("prev").style.visibility = "visible";
+                document.getElementById("next").style.visibility = "visible";
             }
             }
         </script>
@@ -125,7 +140,19 @@ def home(request):
         </div>
         
         <h2 class="mt-2">Immagini correlate</h2>
-        <div id="slideshow" style="display: flex;"></div>
+        <div id="slideshowContainer" style="display: flex; width: 25%; margin: auto;" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner" id="slideshow">
+            </div>
+            <a class="carousel-control-prev" href="#slideshowContainer" role="button" data-slide="prev" id="prev" style="visibility: hidden;">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#slideshowContainer" role="button" data-slide="next" id="next" style="visibility: hidden;">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+        <!-- <div id="slideshow" style="display: flex;"></div> -->
     </body>
     </html>
     """
