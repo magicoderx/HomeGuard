@@ -103,5 +103,5 @@ def send_email(faces,photourl):
     smtp.sendmail(smtp_user, receiver_email, message.as_string())
     smtp.quit()
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+if __name__ == "__main__":
+    app.run(debug=True)
