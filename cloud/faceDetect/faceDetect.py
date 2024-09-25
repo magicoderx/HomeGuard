@@ -64,7 +64,7 @@ def send_email(faces,photourl):
 
     # Compose message
     message = MIMEMultipart("alternative")
-    message['Subject'] = "TEST"
+    message['Subject'] = "Anomalia in casa!"
     message['From'] = smtp_user
     message['To'] = receiver_email
 
