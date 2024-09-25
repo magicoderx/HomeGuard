@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
 from google.cloud import storage
 import tempfile
 import vertexai

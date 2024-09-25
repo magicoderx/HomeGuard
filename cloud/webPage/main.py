@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string, render_template
+from flask import Flask, render_template_string
 from google.cloud import firestore, storage
 import datetime
 
@@ -17,10 +17,10 @@ def home(request):
     if data_selected:
         start = datetime.datetime.strptime(data_selected, "%Y-%m-%d")
         end = start + datetime.timedelta(days=1)
-        sensorDB = db.collection('sensori').where('timestamp', '>=', start).where('timestamp', '<', end).stream()
+        sensorDB = db.collection('sensors').where('timestamp', '>=', start).where('timestamp', '<', end).stream()
     # If there is no date selected print last 100 values
     else:
-        sensorDB = db.collection('sensori').order_by('timestamp').limit(100).stream()
+        sensorDB = db.collection('sensors').order_by('timestamp').limit(100).stream()
     
     data = [['Time', 'Temperature', 'Consumption']]
     # Save data in dictionary
@@ -30,8 +30,7 @@ def home(request):
     
     # Define HTML code
     html = "" # Paste here your HTML
-    #return render_template_string(html, chart_data=data, data_selected=data_selected)
-    return render_template('dashboard.html')
+    return render_template_string(html, chart_data=data, data_selected=data_selected)
 
 if __name__ == "__main__":
     app.run(debug=True)
