@@ -1,9 +1,7 @@
-from flask import Flask, render_template_string
+from flask import render_template_string
 from google.cloud import firestore, storage
 import datetime
 
-# Initialize flask app
-app = Flask(__name__)
 # Initialize firestore client
 db = firestore.Client()
 # Initialize google storage client
@@ -31,6 +29,3 @@ def home(request):
     # Define HTML code
     html = "" # Paste here your HTML
     return render_template_string(html, chart_data=data, data_selected=data_selected)
-
-if __name__ == "__main__":
-    app.run(debug=True)

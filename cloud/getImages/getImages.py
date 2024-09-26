@@ -1,14 +1,12 @@
-from flask import Flask, jsonify
+from flask import jsonify
 import os
 from google.cloud import storage
 import datetime
 
-app = Flask(__name__)
 err_str = "Specified environment variable is not set."
 # Initialize google storage client
 storage_client = storage.Client()
 
-@app.route("/", methods=["GET"])
 def get_images(request):
     # Get current timestamp and parse it in firestore format
     timestamp = request.args.get('timestamp')
@@ -38,6 +36,3 @@ def get_images_by_date(bucket_name, date):
             images.append(blob)
 
     return images
-
-if __name__ == "__main__":
-    app.run(debug=True)

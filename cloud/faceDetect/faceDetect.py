@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify
+from flask import jsonify
 from google.cloud import storage
 import tempfile
 import vertexai
@@ -8,14 +8,12 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-app = Flask(__name__)
 err_str = "Specified environment variable is not set."
 
 # Init generative model in Europe West3 region
 vertexai.init(project=os.environ.get("GSTORAGE_ID", err_str), location="europe-west3")
 model = GenerativeModel(model_name="gemini-1.0-pro-vision-001")
 
-@app.route('/', methods=['POST'])
 def analyze_and_upload(request):
     # Get file received
     file = request.files['file']
@@ -102,6 +100,3 @@ def send_email(faces,photourl):
     smtp.login(smtp_user, password)
     smtp.sendmail(smtp_user, receiver_email, message.as_string())
     smtp.quit()
-
-if __name__ == "__main__":
-    app.run(debug=True)
