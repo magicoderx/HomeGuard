@@ -37,8 +37,10 @@ I server in questo progetto non sono altro che Cloud Functions su cui sono defin
 ### Elaboratore dati
 Per deployare questa funzione bisogna eseguire questo comando:
 ```
-gcloud functions deploy save_data 
+gcloud functions deploy getData \
   --runtime python312 \
+  --region europe-west3 \
+  --entry-point save_data \
   --trigger-http \
   --allow-unauthenticated
 ```
@@ -47,14 +49,22 @@ Questa funzione prende la richiesta parsata in JSON e ottiene i valori di `tempe
 ### Analizzatore immagini
 Per deployare questa funzione bisogna eseguire il seguente comando:
 ```
-gcloud functions deploy analyze_and_upload 
+gcloud functions deploy faceDetect \
   --runtime python312 \
+  --region europe-west3 \
+  --entry-point analyze_and_upload \
   --trigger-http \
   --allow-unauthenticated \
   --memory 1GB \
   --cpu 0.583 \
   --timeout 104s \
-  --set-env-vars GFUNCTION_URL="URL_GENERICO_DELLE_GFUNCTION",GSTORAGE_ID="ID_GOOGLE_STORAGE",SMTP_SERVER="SERVER_SMTP_MAIL",SMTP_PORT="PORTA_SMTP",SMTP_LOGIN_USER="LOGIN_USER_SMTP",SMTP_LOGIN_PASS="LOGIN_PASSWORD_SMTP",SMTP_TO="DESTINATARIO_EMAIL" \
+  --set-env-vars GFUNCTION_URL="URL_GENERICO_DELLE_GFUNCTION" \
+  --set-env-vars GSTORAGE_ID="ID_GOOGLE_STORAGE" \
+  --set-env-vars SMTP_SERVER="SERVER_SMTP_MAIL" \
+  --set-env-vars SMTP_PORT="PORTA_SMTP" \
+  --set-env-vars SMTP_LOGIN_USER="LOGIN_USER_SMTP" \
+  --set-env-vars SMTP_LOGIN_PASS="LOGIN_PASSWORD_SMTP" \
+  --set-env-vars SMTP_TO="DESTINATARIO_EMAIL"
 ```
 Per questa applicazione c'è bisogno di più memoria e timeout rispetto alle altre Google Functions in quanto la ricezione di immagini e la loro elaborazione richiede più capacità di calcolo. Questa funzione ottiene e memorizza il file in una posizione temporanea nel container (salvando l'immagine anche in Google Storage con l'opportuna estensione) per poi analizzare l'immagine tramite il pacchetto `vertexai` chiedendo all'intelligenza artificiale qual'è il numero di volti che rileva, forzando una risposta numerica e senza punteggiatura in modo tale da poterla elaborare e parsare in intero.
 
@@ -68,8 +78,10 @@ Durante lo sviluppo di questa funzione sono sorti degli ostacoli riguardanti:
 ### Ottenitore di immagini
 Per deployare questa funzione bisogna eseguire questo comando:
 ```
-gcloud functions deploy get_images 
+gcloud functions deploy getImages \
   --runtime python312 \
+  --region europe-west3 \
+  --entry-point get_images \
   --trigger-http \
   --allow-unauthenticated \
   --set-env-vars GSTORAGE_ID="ID_GOOGLE_STORAGE"
@@ -79,8 +91,10 @@ Questa funzione funge da middleware per */website*. Ottiene il valore del timest
 ### Pagina web
 Per deployare questa funzione bisogna eseguire questo comando:
 ```
-gcloud functions deploy home 
+gcloud functions deploy website \
   --runtime python312 \
+  --region europe-west3 \
+  --entry-point home \
   --trigger-http \
   --allow-unauthenticated
 ```
