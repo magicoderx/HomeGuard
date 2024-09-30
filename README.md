@@ -78,9 +78,13 @@ gcloud functions deploy getImages \
   --entry-point get_images \
   --trigger-http \
   --allow-unauthenticated \
-  --set-env-vars GSTORAGE_ID="ID_GOOGLE_STORAGE"
+  --set-env-vars GSTORAGE_ID="ID_GOOGLE_STORAGE" \
+  --service-account "SERVICE_ACCOUNT_ID"
 ```
-Questa funzione funge da middleware per */website*. Ottiene il valore del timestamp dalla request e lo parsa nel formato di timestamp che si ottiene da `blob.time_created.date()`, in modo tale da poter ottenere tutti i file all'interno del Google Storage e inserire in un array, soltanto i file di quella data. Dopo aver creato questo array, viene creato un dizionario con le chiavi *name* e *url* utilizzato per inviare una risposta in JSON
+Questa funzione funge da middleware per */website*. Ottiene il valore del timestamp dalla request e lo parsa nel formato di timestamp che si ottiene da `blob.time_created.date()`, in modo tale da poter ottenere tutti i file all'interno del Google Storage e inserire in un array, soltanto i file di quella data. Dopo aver creato questo array, viene creato un dizionario con le chiavi *name* e *url* utilizzato per inviare una risposta in JSON. In particolare l'URL fornito è un URL firmato in modo tale da poter fornire URL temporanei alla pagina web in modo tale da poter visualizzare correttamente le immagini nonostante sia inibito l'accesso dall'esterno.
+
+#### Impostazione ruolo
+Come si può notare dalla stringa di deploy, c'è un parametro `--service-account` che permette di specificare il service account che possiede la funzione. In questo caso il service account dovrà essere creato dal pannello `Google Cloud->IAM & Administration->Service Account`. Dopodiché si crea un service account che abbia un ruolo per viasualizzare gli elementi nello storage. A questo punto diventa necessario andare a creare una chiave privata per questo service account appena creato andando in `CHIAVI->Aggiungi chiave` per esportarla in formato JSON e caricarla nella stessa directory della funzione. In questo modo, quando verrà chiamata la funzione, questa accederà allo storage autenticandosi tramite credenziali e ciò permetterà di generare un URL temporaneo per le immagini
 
 ### Pagina web
 Per deployare questa funzione bisogna eseguire questo comando:
