@@ -27,6 +27,10 @@ def home():
     for doc in sensorDB:
         dati = doc.to_dict()
         data.append([dati['timestamp'].strftime("%Y-%m-%d %H:%M:%S"), dati['temperature'], dati['consumption']])
+
+    # If data is empty fot those day, append an empty row
+    if len(data) == 1:
+        data.append([None, 0, 0])
     
     # Render the HTML page
     return render_template('dashboard.html', chart_data=data, data_selected=data_selected)

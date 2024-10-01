@@ -109,7 +109,12 @@
 
         // Function that create chart from data
         function drawChart() {
-            var data = google.visualization.arrayToDataTable({{ chart_data|safe }});
+            var data = google.visualization.arrayToDataTable({{ chart_data|tojson }});
+            // If there are no data, print error message
+            if (data.getNumberOfRows() === 0 || data.getValue(0, 0) === null) {
+                document.getElementById('chart_div').innerHTML = '<p class="text-center text-white card-custom p-4 mb-4">Nessun dato disponibile per la data selezionata.</p>';
+                return;
+            }
             // Customize chart
             var options = {
                 title: 'Dati sensori',
@@ -138,7 +143,7 @@
             function fetchImages(date) {
                 $.ajax({
                     // Perform GET request to another gfunction
-                    url: "https://europe-west3-pcloud-pesole-2024.cloudfunctions.net/getImages",
+                    url: "/getImages",
                     method: "GET",
                     data: {timestamp: date},
                     success: function(response) {
